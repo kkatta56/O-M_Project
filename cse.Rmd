@@ -1,0 +1,316 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+install.packages("tidyverse")
+install.packages("dplyr")
+install.packages("ggplot2")
+```
+
+```{r}
+#initialize all of the libraries used in this report
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(kableExtra)
+library(scales)
+```
+
+```{r}
+# upload data sets and create data frames from of both
+data <- read.csv("cse.csv")
+data <- as.data.frame(data)
+```
+
+```{r}
+data <- data %>%
+  mutate(beaufort = ifelse(v10..m.s. < 0.5, 0,
+                    ifelse(v10..m.s. >= 0.5 & v10..m.s. < 1.5, 1,
+                    ifelse(v10..m.s. >= 1.5 & v10..m.s. < 3.3, 2,
+                    ifelse(v10..m.s. >= 3.3 & v10..m.s. < 5.5, 3,
+                    ifelse(v10..m.s. >= 5.5 & v10..m.s. < 7.9, 4,
+                    ifelse(v10..m.s. >= 7.9 & v10..m.s. < 10.7, 5,
+                    ifelse(v10..m.s. >= 10.7 & v10..m.s. < 13.8, 6,
+                    ifelse(v10..m.s. >= 13.8 & v10..m.s. < 17.1, 7,
+                    ifelse(v10..m.s. >= 17.1 & v10..m.s. < 20.7, 8, 9
+                    ))))))))))
+```
+
+```{r}
+data <- data %>%  
+  group_by(Year, Month, Day) %>% 
+  summarize(max_beaufort = max(beaufort))
+```
+
+```{r}
+# add index column to create day in year column
+data <- tibble::rowid_to_column(data, "index")
+
+# add day in year column
+data <- data %>%
+  mutate(DayInYear = index %% 365)
+
+# modulo operation makes the 365th day 0. Change 0 to 365
+for (i in 1:length(data$DayInYear)) {
+  if (data$DayInYear[i] == 0) {
+    data$DayInYear[i] = 365
+  }
+}
+
+# create categorical variable that divides the year into 4 parts
+data <- data %>%
+  mutate(Quarter = ifelse(Month >= 1 & Month < 4, "Q1",
+                   ifelse(Month >= 4 & Month < 7, "Q2",
+                   ifelse(Month >= 7 & Month < 10, "Q3",
+                   ifelse(Month >= 10 & Month <= 12, "Q4",
+                    )))))
+```
+
+
+```{r}
+#find days that are safe to go
+beaufort_limit = 5
+data <- data %>%
+  mutate(safe = ifelse(max_beaufort <= beaufort_limit, T, F))
+
+#create window variable by checking for consecutive safe days
+true_val = 0
+for (i in 1:length(data$safe)) {
+  if (data$safe[i]) {
+    true_val = true_val + 1
+    data$window[i] = true_val
+  } else {
+    true_val = 0
+    data$window[i] = true_val
+  }
+}
+```
+
+```{r}
+data <- data %>%
+  select(Year, Month, Day, DayInYear, Quarter, max_beaufort, safe, window)
+```
+
+
+```{r}
+d08 <- data %>% filter(Year == 2008)
+d09 <- data %>% filter(Year == 2009)
+d10 <- data %>% filter(Year == 2010)
+d11 <- data %>% filter(Year == 2011)
+d12 <- data %>% filter(Year == 2012)
+d13 <- data %>% filter(Year == 2013)
+d14 <- data %>% filter(Year == 2014)
+d15 <- data %>% filter(Year == 2015)
+d16 <- data %>% filter(Year == 2016)
+d17 <- data %>% filter(Year == 2017)
+
+ggplot(data = d08, aes(DayInYear, window, color = "2008")) + 
+  geom_point() +
+  geom_point(data = d09, aes(color = "2009")) +
+  geom_point(data = d10, aes(color = "2010")) +
+  geom_point(data = d11, aes(color = "2011")) +
+  geom_point(data = d12, aes(color = "2012")) +
+  geom_point(data = d13, aes(color = "2013")) +
+  geom_point(data = d14, aes(color = "2014")) +
+  geom_point(data = d15, aes(color = "2015")) +
+  geom_point(data = d16, aes(color = "2016")) +
+  geom_point(data = d17, aes(color = "2017")) +
+
+  facet_wrap(~Quarter) + 
+  
+  #change the theme so that the year strip is black and text is white
+  theme(
+  strip.background = element_rect(fill = "grey20", color = "grey80", size = 1),
+  strip.text = element_text(colour = "white")
+  ) +
+  
+  #add title and axis labels
+  ggtitle("Binary Time Series by Season over the Course of the Year, 2008-2017") + 
+  xlab("Day") + ylab("Number of Consecutive Safe Weather Days")
+```
+
+```{r}
+ggplot(data = d08, aes(DayInYear, max_beaufort, color = "2008")) + 
+  geom_point() +
+  geom_point(data = d09, aes(color = "2009")) +
+  geom_point(data = d10, aes(color = "2010")) +
+  geom_point(data = d11, aes(color = "2011")) +
+  geom_point(data = d12, aes(color = "2012")) +
+  geom_point(data = d13, aes(color = "2013")) +
+  geom_point(data = d14, aes(color = "2014")) +
+  geom_point(data = d15, aes(color = "2015")) +
+  geom_point(data = d16, aes(color = "2016")) +
+  geom_point(data = d17, aes(color = "2017")) +
+
+  facet_wrap(~Quarter) + 
+  
+  #change the theme so that the year strip is black and text is white
+  theme(
+  strip.background = element_rect(fill = "grey20", color = "grey80", size = 1),
+  strip.text = element_text(colour = "white")
+  ) +
+  
+  #add title and axis labels
+  ggtitle("Beaufort Scale by Season over the Course of the Year, 2008-2017") + 
+  xlab("Day") + ylab("Beaufort Scale Value")
+```
+
+```{r}
+#a stat function is used to show the distrubtion of beaufort scale values for each
+#month over the three years
+ggplot(data = data) + 
+  stat_summary(
+    mapping = aes(x = Quarter, y = max_beaufort),
+    fun.min = min,
+    fun.max = max,
+    fun = mean
+  ) +
+  
+  #no decimal values for scale
+  scale_y_continuous(limits = c(1, 10), breaks = 2:9) +
+
+  #create a theme that emphasized decimal values less and shrinks title font so it 
+  #can fit without getting cut off
+  theme(panel.grid.minor = element_line(linetype = "dotted")) +
+  theme(plot.title = element_text(size = 12)) + 
+  
+  #add title and axis labels
+  ggtitle("Average Beaufort Scale Values for Each Quarter of the Year, 2008-2017") + 
+  xlab("Month") + ylab("Beaufort Scale Value")
+  
+```
+
+
+------------------------------
+
+
+```{r}
+#graphs beaufort
+season = "Winter"
+ggplot(d08, aes(DayInYear, max_beaufort)) +
+  geom_line(aes(color = "2008")) +
+  geom_line(data = d09, aes(color = "2009")) +
+  geom_line(data = d10, aes(color = "2010")) +
+  geom_line(data = d11, aes(color = "2011")) +
+  geom_line(data = d12, aes(color = "2012")) +
+  geom_line(data = d13, aes(color = "2013")) +
+  geom_line(data = d14, aes(color = "2014")) +
+  geom_line(data = d15, aes(color = "2015")) +
+  geom_line(data = d16, aes(color = "2016")) +
+  geom_line(data = d17, aes(color = "2017")) +
+  xlab("Day") + ylab("Beaufort Value") + ggtitle("Beaufort Values for Each Year 2008-2017") +
+  scale_y_continuous(limits = c(1, 9))
+```
+
+```{r}
+#graphs beaufort
+q = "Q1"
+ggplot(d08[d08$Quarter %in% q,], aes(DayInYear, max_beaufort)) +
+  geom_line(aes(color = "2008")) +
+  
+  geom_line(data = d09[d09$Quarter %in% q,], aes(color = "2009")) +
+  
+  geom_line(data = d10[d10$Quarter %in% q,], aes(color = "2010")) +
+  
+  geom_line(data = d11[d11$Quarter %in% q,], aes(color = "2011")) +
+  
+  geom_line(data = d12[d12$Quarter %in% q,], aes(color = "2012")) +
+  
+  geom_line(data = d13[d13$Quarter %in% q,], aes(color = "2013")) +
+  
+  geom_line(data = d14[d14$Quarter %in% q,], aes(color = "2014")) +
+  
+  geom_line(data = d15[d15$Quarter %in% q,], aes(color = "2015")) +
+  
+  geom_line(data = d16[d16$Quarter %in% q,], aes(color = "2016")) +
+  
+  geom_line(data = d17[d17$Quarter %in% q,], aes(color = "2017")) +
+  
+  xlab("Day") + ylab("Beaufort Value") + ggtitle("Beaufort Values in Winter 2008-2017") +
+  scale_y_continuous(limits = c(0, 10))
+```
+
+```{r}
+#graphs binary time series
+q = "Q2"
+ggplot(d08[d08$Quarter %in% season,], aes(DayInYear, window)) +
+  geom_point(aes(color = "2008")) +
+  geom_line(aes(color = "2008")) +
+  
+  geom_point(data = d09[d09$Quarter %in% q,], aes(color = "2009")) +
+  geom_line(data = d09[d09$Quarter %in% q,], aes(color = "2009")) +
+  
+  geom_point(data = d10[d10$Quarter %in% q,], aes(color = "2010")) +
+  geom_line(data = d10[d10$Quarter %in% q,], aes(color = "2010")) +
+  
+  geom_point(data = d11[d11$Quarter %in% q,], aes(color = "2011")) +
+  geom_line(data = d11[d11$Quarter %in% q,], aes(color = "2011")) +
+  
+  geom_point(data = d12[d12$Quarter %in% q,], aes(color = "2012")) +
+  geom_line(data = d12[d12$Quarter %in% q,], aes(color = "2012")) +
+  
+  geom_point(data = d13[d13$Quarter %in% q,], aes(color = "2013")) +
+  geom_line(data = d13[d13$Quarter %in% q,], aes(color = "2013")) +
+  
+  geom_point(data = d14[d13$Quarter %in% q,], aes(color = "2014")) +
+  geom_line(data = d14[d13$Quarter %in% q,], aes(color = "2014")) +
+  
+  geom_point(data = d15[d13$Quarter %in% q,], aes(color = "2015")) +
+  geom_line(data = d15[d13$Quarter %in% q,], aes(color = "2015")) +
+  
+  geom_point(data = d16[d13$Quarter %in% q,], aes(color = "2016")) +
+  geom_line(data = d16[d13$Quarter %in% q,], aes(color = "2016")) +
+  
+  geom_point(data = d17[d13$Quarter %in% q,], aes(color = "2017")) +
+  geom_line(data = d17[d13$Quarter %in% q,], aes(color = "2017")) +
+  
+  xlab("Day") + ylab("Beaufort Value") + ggtitle("Binary Time Series Values in Spring 2008-2017")
+```
+
+---------------------------------
+
+```{r}
+BeaufortSafetyThres = 5
+WorkTime = 1
+
+#Elapsed time series
+BinaryTS = data$max_beaufort <= BeaufortSafetyThres
+BinaryTS = as.numeric(BinaryTS)
+ElapsedFavorableTime = rep(0,length(BinaryTS))
+
+if(BinaryTS[1]) {ElapsedFavorableTime[1] = 1}
+
+for (i in 2:length(BinaryTS)) {
+  if(BinaryTS[i]) {
+    ElapsedFavorableTime[i] = ElapsedFavorableTime[i-1] + 1
+  }
+}
+
+#burnin
+burnin = np.where(ElapsedFavorableTime == 0)[0][0]
+BinaryTS = np.array(BinaryTS[burnin:])
+elaps = ElapsedFavorableTime[burnin:]
+ub = np.max(elaps)
+
+#Intermediate transition matrix
+CmfWTC = np.zeros((ub+1,ub+1), dtype=int)
+
+# Elapsed Time Safe Weather Truncation: 21+ time steps will be considered as 21
+#elaps_trnc = ElapsedFavorableTime.copy()
+#elaps_trnc[np.where(ElapsedFavorableTime > 21)] = 21
+
+for i in range(WorkTime,len(elaps)):
+    CmfWTC[elaps[i-WorkTime],elaps[i]] += 1
+
+TransitionWTC = np.divide(CmfWTC,np.sum(CmfWTC,1)[:,None])
+TransitionWTC[np.where(TransitionWTC == 0)] = np.nan
+tr_reduced = np.zeros((184,2))
+for i in range(182):
+    tr_reduced[i,0] = TransitionWTC[i,0]
+    tr_reduced[i,1] = TransitionWTC[i,i+1]
+```
+
+
