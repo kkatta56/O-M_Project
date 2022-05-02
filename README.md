@@ -13,4 +13,4 @@ Wind speed data collected from an offshore site in Scotland from 2008 to 2017 wa
 This visualization shows the mean, minimum, and maximum Beafort Scale values for each quarter of the year between 2008 to 2017. The first and last quarters of the year depict a higher average Beaufort Scale value, meaning that the colder months have harsher wind conditions when compared to the warmer months.
 
 ## Reference Links
-[Original Research Paper](https://github.com/kkatta56/O-M_Project/commit/d3824154b054cf30df9d7eec0bbdfdfcbf28d459)
+[Original Research Paper](https://github.com/kkatta56/O-M_Project/commit/d3824154b054cf30df9d7eec0bbdfdfcbf28d459) 
