@@ -19,6 +19,6 @@
   This visualization shows that there are significantly longer periods of safe weather windows during the warmer months than the colder months. There are clear seasonal variations shown qualitatively through the above visualizations
   
 ## Markov Decision Process
-A Markov Decision Process (MDP) framework was created
+A Markov Decision Process (MDP) framework was created to help find the optimal policy that minimizes the overall cost that occurs due to unsuccesful O&M activities and the loss of revenue from lack of O&M.
 
 ## Reference Links
