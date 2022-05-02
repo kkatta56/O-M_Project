@@ -4,7 +4,8 @@ This repository contains code and data visualizations pertaining to the stochast
 ## Visualizations
 Wind speed data collected from an offshore site in Scotland from 2008 to 2017 was used for this project. Data was collected every six hours everyday for these 10 years. This wind speed data was used to determine a Beaufort Scale aalue for each day. The Beaufort Scale value for each day in each of the four quarters of the year is visualized below.
 
- 
+  ![BeaufortByQuarter](/images/BeaufortByQuarter.png)
+
  The difference between the different quarters of the year is more clearly seen by the boxplot below.
  
  ![BeaufortBoxPlot](/images/BeaufortBoxPlot.png)
