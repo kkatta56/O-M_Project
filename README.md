@@ -14,7 +14,7 @@
 
   The safe weather windows when the safety threshold is set to a Beaufort Scale value less than or equal to 5 for each quarter of the year between 2008 and 2017 is shown in the figure below.
   
-  ![BeaufortBoxPlot](/images/BeaufortBoxPlot.png)
+  ![BinaryTimeSeriesQuarter](/images/BinaryTimeSeriesQuarter.png)
   
   This visualization shows that there are significantly longer periods of safe weather windows during the warmer months than the colder months. There are clear seasonal variations shown qualitatively through the above visualizations
   
