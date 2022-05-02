@@ -1,1 +1,2 @@
 # O&M Project
+This repository contains data visualizations and code pertaining to a Stochastic Weather Window Analysis in Operations and Maintenance (O&M) Planning Policies for Floating Offshore Platforms. The code in this project was written by Kaushik Katta in the R language and is based on Python code developed by [Taemin Heo](http://taeminheo.com) and [Dr. Lance Manuel](https://lancemanuel.netlify.app/) at the University of Texas at Austin.
